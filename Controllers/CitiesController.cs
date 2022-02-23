@@ -7,14 +7,18 @@ namespace CityInformation.API.Controllers
     public class CitiesController : ControllerBase
     {
         [HttpGet()]
-        public JsonResult Cities()
+        public JsonResult GetCities()
         {
             return new JsonResult(
-                new List<object>()
-                {
-                    new { id = 1, name  = "name1"},
-                    new { id = 2, name  = "name2"},
-                }
+                CitiesDataStore.Current.Cities
+            );
+        }
+
+        [HttpGet("{id}")]
+        public JsonResult GetCity(int id)
+        {
+            return new JsonResult(
+                CitiesDataStore.Current.Cities.FirstOrDefault(x => x.Id == id)
             );
         }
     }
