@@ -1,5 +1,6 @@
 ﻿using CityInformation.API.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -61,7 +62,7 @@ namespace CityInformation.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<PointOfInterestDto> UpdatePointOfInterest(
+        public ActionResult UpdatePointOfInterest(
         int cityId,
         int id,
         PointOfInterestForUpdateDto pointOfInterest)
@@ -75,6 +76,33 @@ namespace CityInformation.API.Controllers
             dbPointOfInterest.Name = pointOfInterest.Name;
             dbPointOfInterest.Description = pointOfInterest.Description;
 
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public ActionResult<PointOfInterestDto> PartialUpdatePointOfInterest(
+        int cityId,
+        int id,
+        JsonPatchDocument<PointOfInterestForUpdateDto> partialPointOfInterest)
+        {
+            var city = CitiesDataStore.Current.Cities.FirstOrDefault(x => x.Id == cityId);
+            if (city == null) return NotFound();
+
+            var dbPointOfInterest = city.PointsOfInterest.FirstOrDefault(x => x.Id == id);
+            if (dbPointOfInterest == null) return NotFound();
+
+            var pointOfInterest = new PointOfInterestForUpdateDto()
+            {
+                Name = dbPointOfInterest.Name,
+                Description = dbPointOfInterest.Description,
+            };
+
+            partialPointOfInterest.ApplyTo(pointOfInterest, ModelState);
+            if(!ModelState.IsValid) return BadRequest(ModelState);
+            if(!TryValidateModel(pointOfInterest)) return BadRequest(ModelState);
+
+            dbPointOfInterest.Name = pointOfInterest.Name;
+            dbPointOfInterest.Description = pointOfInterest.Description;
 
             return NoContent();
         }
