@@ -32,7 +32,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 //builder.Services.AddTransient<CitiesDataStore>();
 builder.Services.AddDbContext<CityInformationContext>(
-    options => options.UseSqlite("Data Source=CityInformation.db")
+    options => options
+    .UseSqlite(builder
+                .Configuration["ConnectionStrings:CityInformationDb"])
 );
 
 #if DEBUG
