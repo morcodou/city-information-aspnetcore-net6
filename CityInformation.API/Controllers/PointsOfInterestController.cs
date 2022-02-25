@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CityInformation.API.Entities;
 using CityInformation.API.Interfaces;
 using CityInformation.API.Models;
 using CityInformation.API.Services;
@@ -66,33 +67,27 @@ namespace CityInformation.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PointOfInterestDto> CreatePointOfInterest(
+        public async Task<ActionResult<PointOfInterestDto>> CreatePointOfInterest(
             int cityId,
             PointOfInterestForCreationDto pointOfInterest)
         {
-            var city = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == cityId);
-            if (city == null) return NotFound();
-
-            var id = _citiesDataStore.Cities
-                .SelectMany(x => x.PointsOfInterest)
-                .Max(x => x.Id);
-
-            var newPointOfInterest = new PointOfInterestDto()
+            if (!await _cityRepository.CityExitsAsync(cityId))
             {
-                Name = pointOfInterest.Name,
-                Description = pointOfInterest.Description,
-                Id = id + 1,
-            };
+                return NotFound();
+            }
 
-            city.PointsOfInterest.Add(newPointOfInterest);
+            var newPointOfInterest = _mapper.Map<PointOfInterest>(pointOfInterest);
+            await _cityRepository.AddPointOfInterestForCityAsync(cityId, newPointOfInterest);
+            await _cityRepository.SaveChangesAsync();
+            var pointOfInterestDto = _mapper.Map<PointOfInterestDto>(newPointOfInterest);
 
             return CreatedAtRoute("GetPointOfInterest",
                 new
                 {
                     cityId = cityId,
-                    id = newPointOfInterest.Id,
+                    id = pointOfInterestDto.Id,
                 },
-                newPointOfInterest
+                pointOfInterestDto
            );
         }
 
