@@ -112,29 +112,28 @@ namespace CityInformation.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        public ActionResult<PointOfInterestDto> PartialUpdatePointOfInterest(
+        public async Task<ActionResult> PartialUpdatePointOfInterest(
         int cityId,
         int id,
         JsonPatchDocument<PointOfInterestForUpdateDto> partialPointOfInterest)
         {
-            var city = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == cityId);
-            if (city == null) return NotFound();
+            if (!await _cityRepository.CityExitsAsync(cityId))
+            {
+                return NotFound();
+            }
 
-            var dbPointOfInterest = city.PointsOfInterest.FirstOrDefault(x => x.Id == id);
+            var dbPointOfInterest = await _cityRepository.GetPointOfInterestForCityAsync(cityId, id);
             if (dbPointOfInterest == null) return NotFound();
 
-            var pointOfInterest = new PointOfInterestForUpdateDto()
-            {
-                Name = dbPointOfInterest.Name,
-                Description = dbPointOfInterest.Description,
-            };
+
+            var pointOfInterest = _mapper.Map<PointOfInterestForUpdateDto>(dbPointOfInterest);
 
             partialPointOfInterest.ApplyTo(pointOfInterest, ModelState);
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (!TryValidateModel(pointOfInterest)) return BadRequest(ModelState);
 
-            dbPointOfInterest.Name = pointOfInterest.Name;
-            dbPointOfInterest.Description = pointOfInterest.Description;
+            _mapper.Map(pointOfInterest, dbPointOfInterest);
+            await _cityRepository.SaveChangesAsync();
 
             return NoContent();
         }
