@@ -30,9 +30,9 @@ builder
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
-builder.Services.AddTransient<CitiesDataStore>();
+//builder.Services.AddTransient<CitiesDataStore>();
 builder.Services.AddDbContext<CityInformationContext>(
-    options => options.UseSqlite("Data Store=CityInformation.db")
+    options => options.UseSqlite("Data Source=CityInformation.db")
 );
 
 #if DEBUG
