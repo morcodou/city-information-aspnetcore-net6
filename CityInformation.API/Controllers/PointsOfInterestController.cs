@@ -1,4 +1,5 @@
-﻿using CityInformation.API.Interfaces;
+﻿using AutoMapper;
+using CityInformation.API.Interfaces;
 using CityInformation.API.Models;
 using CityInformation.API.Services;
 using Microsoft.AspNetCore.Http;
@@ -15,52 +16,53 @@ namespace CityInformation.API.Controllers
         private readonly ILogger<PointsOfInterestController> _logger;
         private readonly IMailService _mailService;
         private readonly CitiesDataStore _citiesDataStore;
+        private readonly ICityRepository _cityRepository;
+        private readonly IMapper _mapper;
 
         public PointsOfInterestController(
             ILogger<PointsOfInterestController> logger,
             IMailService mailService,
+            ICityRepository cityRepository,
+            IMapper mapper,
             CitiesDataStore citiesDataStore
             )
         {
             _logger = logger;
             _mailService = mailService;
+            _cityRepository = cityRepository;
+            _mapper = mapper;
             _citiesDataStore = citiesDataStore;
-        } 
+        }
 
         [HttpGet]
-        public ActionResult<IEnumerable<PointOfInterestDto>> GetPointsOfInterest(int cityId)
+        public async Task<ActionResult<IEnumerable<PointOfInterestDto>>> GetPointsOfInterest(int cityId)
         {
-            try
+            if (!await _cityRepository.CityExitsAsync(cityId))
             {
-                var city = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == cityId);
-                if (city == null)
-                {
-                    _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
-                    return NotFound();
-                }
-
-                return Ok(city.PointsOfInterest);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical($"Exception while getting points of interest for city with id {cityId}", ex);
-                return StatusCode(500, "A problem happened while handling your request");
+                _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
+                return NotFound();
             }
 
+            var pointsOfInterest = await _cityRepository.GetPointsOfInterestForCityAsync(cityId);
+            return Ok(_mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterest));
         }
 
         [HttpGet("{id}", Name = "GetPointOfInterest")]
-        public ActionResult<PointOfInterestDto> GetPointOfInterest(int cityId, int id)
+        public async Task<ActionResult<PointOfInterestDto>> GetPointOfInterest(int cityId, int id)
         {
-            var city = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == cityId);
-            if (city == null)  {
+            if (!await _cityRepository.CityExitsAsync(cityId))
+            {
                 _logger.LogInformation($"City with id {cityId} wasn't found when accessing point of interest");
-                  return  NotFound();
+                return NotFound();
             }
 
-            var pointOfInterest = city.PointsOfInterest.FirstOrDefault(x => x.Id == id);
-            if (pointOfInterest == null) return NotFound();
-            return Ok(pointOfInterest);
+            var pointOfInterest = await _cityRepository.GetPointOfInterestForCityAsync(cityId, id);
+            if (pointOfInterest == null)
+            {
+                _logger.LogInformation($"Point of interest with id {id} and city id {cityId} wasn't found");
+                return NotFound();
+            }
+            return Ok(_mapper.Map<PointOfInterestDto>(pointOfInterest));
         }
 
         [HttpPost]
@@ -131,8 +133,8 @@ namespace CityInformation.API.Controllers
             };
 
             partialPointOfInterest.ApplyTo(pointOfInterest, ModelState);
-            if(!ModelState.IsValid) return BadRequest(ModelState);
-            if(!TryValidateModel(pointOfInterest)) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!TryValidateModel(pointOfInterest)) return BadRequest(ModelState);
 
             dbPointOfInterest.Name = pointOfInterest.Name;
             dbPointOfInterest.Description = pointOfInterest.Description;

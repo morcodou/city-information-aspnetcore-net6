@@ -4,9 +4,10 @@ namespace CityInformation.API.Interfaces
 {
     public interface ICityRepository
     {
+        Task<bool> CityExitsAsync(int cityId);
         Task<IEnumerable<City>> GetCitiesAsync();
         Task<City?> GetCityAsync(int cityId, bool includePointsOfInterest = false);
-        Task<IEnumerable<PointOfInterest>> GetPointsOfInterestAsync(int cityId);
-        Task<PointOfInterest?> GetPointOfInterestAsync(int cityId, int pointOfInterestId);
+        Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId);
+        Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterestId);
     }
 }

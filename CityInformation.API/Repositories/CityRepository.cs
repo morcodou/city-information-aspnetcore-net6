@@ -31,14 +31,14 @@ namespace CityInformation.API.Repositories
             return await cities.FirstOrDefaultAsync();
         }
 
-        public async Task<PointOfInterest?> GetPointOfInterestAsync(int cityId, int pointOfInterestId)
+        public async Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterestId)
         {
             return await _context
                 .PointsOfInterest
                 .FirstOrDefaultAsync(c => c.CityId == cityId && c.Id == pointOfInterestId);
         }
 
-        public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestAsync(int cityId)
+        public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId)
         {
             return await _context
                           .PointsOfInterest
@@ -49,6 +49,11 @@ namespace CityInformation.API.Repositories
         public Task<IEnumerable<PointOfInterest>> GetPointsOfInterestAsync(int cityId, bool includePointsOfInterest = false)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> CityExitsAsync(int cityId)
+        {
+            return  await _context.Cities.AnyAsync(c => c.Id == cityId);
         }
     }
 }
