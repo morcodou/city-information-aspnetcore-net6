@@ -20,9 +20,5 @@ namespace CityInformation.API.Entities
         {
             Name = name;
         }
-        public City()
-        {
-
-        }
     }
 }
