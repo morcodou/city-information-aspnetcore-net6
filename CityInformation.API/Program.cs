@@ -1,6 +1,7 @@
 using CityInformation.API;
 using CityInformation.API.DbContexts;
 using CityInformation.API.Interfaces;
+using CityInformation.API.Repositories;
 using CityInformation.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,8 @@ builder.Services.AddDbContext<CityInformationContext>(
     .UseSqlite(builder
                 .Configuration["ConnectionStrings:CityInformationDb"])
 );
+builder.Services.AddScoped<ICityRepository, CityRepository>();
+
 
 #if DEBUG
 builder.Services.AddTransient<IMailService, LocalMailService>();
