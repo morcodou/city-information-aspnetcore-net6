@@ -12,7 +12,7 @@ namespace CityInformation.API.Tests.Controllers
 
         public CitiesControllerTests()
         {
-            _controller = new CitiesController();
+            _controller = new CitiesController(new CitiesDataStore());
         }
 
         [TestMethod]
