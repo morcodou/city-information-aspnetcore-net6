@@ -16,7 +16,6 @@ namespace CityInformation.API.Controllers
     {
         private readonly ILogger<PointsOfInterestController> _logger;
         private readonly IMailService _mailService;
-        private readonly CitiesDataStore _citiesDataStore;
         private readonly ICityRepository _cityRepository;
         private readonly IMapper _mapper;
 
@@ -24,15 +23,13 @@ namespace CityInformation.API.Controllers
             ILogger<PointsOfInterestController> logger,
             IMailService mailService,
             ICityRepository cityRepository,
-            IMapper mapper,
-            CitiesDataStore citiesDataStore
+            IMapper mapper
             )
         {
             _logger = logger;
             _mailService = mailService;
             _cityRepository = cityRepository;
             _mapper = mapper;
-            _citiesDataStore = citiesDataStore;
         }
 
         [HttpGet]
@@ -139,17 +136,20 @@ namespace CityInformation.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeletePointOfInterest(
+        public async Task<ActionResult> DeletePointOfInterest(
          int cityId,
          int id)
         {
-            var city = _citiesDataStore.Cities.FirstOrDefault(x => x.Id == cityId);
-            if (city == null) return NotFound();
+            if (!await _cityRepository.CityExitsAsync(cityId))
+            {
+                return NotFound();
+            }
 
-            var dbPointOfInterest = city.PointsOfInterest.FirstOrDefault(x => x.Id == id);
+            var dbPointOfInterest = await _cityRepository.GetPointOfInterestForCityAsync(cityId, id);
             if (dbPointOfInterest == null) return NotFound();
 
-            city.PointsOfInterest.Remove(dbPointOfInterest);
+            _cityRepository.DeletePointOfInterest(dbPointOfInterest);
+            await _cityRepository.SaveChangesAsync();
 
             _mailService.Send("Point of interest deleted", $"Point of interest with id {id} and name {dbPointOfInterest.Name}");
             return NoContent();
