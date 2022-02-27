@@ -1,4 +1,5 @@
 ﻿using CityInformation.API.Entities;
+using CityInformation.API.Metadata;
 
 namespace CityInformation.API.Interfaces
 {
@@ -7,6 +8,7 @@ namespace CityInformation.API.Interfaces
         Task<bool> SaveChangesAsync();
         Task<bool> CityExitsAsync(int cityId);
         Task<IEnumerable<City>> GetCitiesAsync();
+        Task<(IEnumerable<City>, Pagination)> GetCitiesAsync(string? name, string? searchQuery, int pageNumber, int pagrSize);
         Task<City?> GetCityAsync(int cityId, bool includePointsOfInterest = false);
         Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityId);
         Task<PointOfInterest?> GetPointOfInterestForCityAsync(int cityId, int pointOfInterestId);

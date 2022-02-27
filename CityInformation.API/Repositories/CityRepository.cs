@@ -1,6 +1,7 @@
 ﻿using CityInformation.API.DbContexts;
 using CityInformation.API.Entities;
 using CityInformation.API.Interfaces;
+using CityInformation.API.Metadata;
 using Microsoft.EntityFrameworkCore;
 
 namespace CityInformation.API.Repositories
@@ -73,6 +74,34 @@ namespace CityInformation.API.Repositories
         public void DeletePointOfInterest(PointOfInterest pointOfInterest)
         {
             _context.PointsOfInterest.Remove(pointOfInterest);
+        }
+
+        public async Task<(IEnumerable<City>, Pagination)> GetCitiesAsync(
+            string? name, 
+            string? searchQuery,
+            int pageNumber,
+            int pageSize)
+        {
+            var cities = _context.Cities as IQueryable<City>;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                cities = cities.Where(c => c.Name == name);
+            }
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                cities = cities.Where(c => 
+                                    c.Name.Contains(searchQuery)
+                                    || (c.Description != null && c.Description.Contains(searchQuery)));
+            }
+
+            var totalItemCount = await cities.CountAsync();
+            var pagination = new Pagination(totalItemCount, pageSize, pageNumber);
+            var filetred = await cities
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .OrderBy(c => c.Name).ToListAsync();
+
+            return (filetred, pagination);
         }
     }
 }

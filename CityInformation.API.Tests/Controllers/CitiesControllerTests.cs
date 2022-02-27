@@ -53,7 +53,7 @@ namespace CityInformation.API.Tests.Controllers
                 .Setup(repository => repository.GetCitiesAsync())
                 .ReturnsAsync(cities);
 
-            var actionResult = await _controller.GetCities();
+            var actionResult = await _controller.GetCities(null, null);
             var okObjectResult = actionResult.Result as OkObjectResult;
             var citiesDto = okObjectResult?.Value as IEnumerable<CityWithoutPointsOfInterestDto>;
 
