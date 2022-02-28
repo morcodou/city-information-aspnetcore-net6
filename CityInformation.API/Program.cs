@@ -5,7 +5,9 @@ using CityInformation.API.Repositories;
 using CityInformation.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -40,6 +42,26 @@ builder.Services.AddDbContext<CityInformationContext>(
 builder.Services.AddScoped<ICityRepository, CityRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        var secret = builder.Configuration["Authentification:SecretForKey"];
+        var issuer = builder.Configuration["Authentification:Issuer"];
+        var audience = builder.Configuration["Authentification:Audience"];
+        var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
+
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = securityKey
+
+        };
+    });
+
 
 #if DEBUG
 builder.Services.AddTransient<IMailService, LocalMailService>();
@@ -60,6 +82,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 
 app.UseAuthorization();
 
