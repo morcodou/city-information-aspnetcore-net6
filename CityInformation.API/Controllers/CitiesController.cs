@@ -26,13 +26,14 @@ namespace CityInformation.API.Controllers
         public async Task<ActionResult<IEnumerable<CityWithoutPointsOfInterestDto>>>
             GetCities(string? name, string? searchQuery, int pageNumber = 1, int pageSize = 10)
         {
-            if(pageNumber< _MAX_CITIES_PAGE_SIZE)
+            if (pageSize > _MAX_CITIES_PAGE_SIZE)
             {
                 pageSize = _MAX_CITIES_PAGE_SIZE;
             }
             var (cities, pagination) = await _cityRepository.GetCitiesAsync(name, searchQuery, pageNumber, pageSize);
             var citiesDto = _mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cities);
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagination));
+            var serialized = JsonSerializer.Serialize(pagination);
+            Response.Headers.Add("X-Pagination", serialized);
             return Ok(citiesDto);
         }
 

@@ -3,8 +3,10 @@ using AutoMapper;
 using CityInformation.API.Controllers;
 using CityInformation.API.Entities;
 using CityInformation.API.Interfaces;
+using CityInformation.API.Metadata;
 using CityInformation.API.Models;
 using CityInformation.API.Profiles;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -37,7 +39,13 @@ namespace CityInformation.API.Tests.Controllers
             }
 
             _cityRepository = Mock.Of<ICityRepository>();
-            _controller = new CitiesController(_cityRepository, _mapper);
+            _controller = new CitiesController(_cityRepository, _mapper)
+            {
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = new DefaultHttpContext()
+                }
+            };
         }
 
         [TestMethod]
@@ -48,10 +56,10 @@ namespace CityInformation.API.Tests.Controllers
                 new City("UT") {Id = 1, Description = "Desc-UT"},
                 new City("UT2") {Id = 2, Description = "Desc-UT2"},
             };
-
+            var pagination = new Pagination(2, 10, 1);
             Mock.Get(_cityRepository)
-                .Setup(repository => repository.GetCitiesAsync())
-                .ReturnsAsync(cities);
+                .Setup(repository => repository.GetCitiesAsync(null, null, 1, 10))
+                .ReturnsAsync((cities, pagination));
 
             var actionResult = await _controller.GetCities(null, null);
             var okObjectResult = actionResult.Result as OkObjectResult;
