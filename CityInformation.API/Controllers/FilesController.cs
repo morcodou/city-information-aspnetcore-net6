@@ -6,7 +6,7 @@ namespace CityInformation.API.Controllers
 {
     [Route("api/files")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class FilesController : ControllerBase
     {
         private readonly FileExtensionContentTypeProvider _contentTypeProvider;
