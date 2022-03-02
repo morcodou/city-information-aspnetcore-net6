@@ -6,6 +6,7 @@ using CityInformation.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
 
@@ -35,6 +36,29 @@ builder.Services.AddSwaggerGen(options =>
 {
     var path = Path.Combine(AppContext.BaseDirectory, "CityInformation.API.xml");
     options.IncludeXmlComments(path);
+
+    options.AddSecurityDefinition("CityBearerAuth",
+
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+        {
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+            Scheme= "Bearer",
+            Description = "Input Valid token  to access to the API"
+        });
+    options.AddSecurityRequirement(new 
+        Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id ="CityBearerAuth",
+                }
+            }, new List<string>()
+        }
+    });
 });
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 builder.Services.AddTransient<CitiesDataStore>();
