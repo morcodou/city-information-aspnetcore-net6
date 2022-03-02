@@ -69,6 +69,15 @@ builder.Services.AddTransient<IMailService, LocalMailService>();
 builder.Services.AddTransient<IMailService, CloudMailService>();
 #endif
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeFromLaval", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("city", "Laval");
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

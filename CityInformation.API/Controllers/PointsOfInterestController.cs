@@ -10,7 +10,7 @@ namespace CityInformation.API.Controllers
 {
     [Route("api/cities/{cityId}/pointsofinterest")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy ="MustBeFromLaval")]
     public class PointsOfInterestController : ControllerBase
     {
         private readonly ILogger<PointsOfInterestController> _logger;
