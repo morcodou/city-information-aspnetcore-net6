@@ -103,5 +103,10 @@ namespace CityInformation.API.Repositories
 
             return (filetred, pagination);
         }
+
+        public async Task<bool> CityNameMatchesCityIdAsync(int cityId, string? cityName)
+        {
+            return await _context.Cities.AnyAsync(c => c.Id==cityId && c.Name == cityName);
+        }
     }
 }
