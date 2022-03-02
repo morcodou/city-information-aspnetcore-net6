@@ -31,7 +31,11 @@ builder
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var path = Path.Combine(AppContext.BaseDirectory, "CityInformation.API.xml");
+    options.IncludeXmlComments(path);
+});
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 builder.Services.AddTransient<CitiesDataStore>();
 builder.Services.AddDbContext<CityInformationContext>(

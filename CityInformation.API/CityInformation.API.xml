@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CityInformation.API</name>
+    </assembly>
+    <members>
+        <member name="M:CityInformation.API.Controllers.CitiesController.GetCity(System.Int32,System.Boolean)">
+            <summary>
+            Get city by id
+            </summary>
+            <param name="id">The given city id</param>
+            <param name="includePointsOfInterest">include the associated points of insterest</param>
+            <returns></returns>
+            <response code="200">Returns the requested city</response>
+        </member>
+    </members>
+</doc>

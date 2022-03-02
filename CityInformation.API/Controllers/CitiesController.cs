@@ -39,7 +39,17 @@ namespace CityInformation.API.Controllers
             return Ok(citiesDto);
         }
 
+        /// <summary>
+        /// Get city by id
+        /// </summary>
+        /// <param name="id">The given city id</param>
+        /// <param name="includePointsOfInterest">include the associated points of insterest</param>
+        /// <returns></returns>
+        /// <response code="200">Returns the requested city</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetCity(int id, bool includePointsOfInterest = false)
         {
             var city = await _cityRepository.GetCityAsync(id, includePointsOfInterest);
