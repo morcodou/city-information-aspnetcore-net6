@@ -5,7 +5,12 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CityInformation.API", "CityInformation.API\CityInformation.API.csproj", "{E9051467-6336-4514-86FC-DBA4625F1D6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityInformation.API.Tests", "CityInformation.API.Tests\CityInformation.API.Tests.csproj", "{05C5B9D3-C5C5-44FA-8E16-A9CB60B09F1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CityInformation.API.Tests", "CityInformation.API.Tests\CityInformation.API.Tests.csproj", "{05C5B9D3-C5C5-44FA-8E16-A9CB60B09F1F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9786202D-2796-4498-9084-CAB3613A3095}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
