@@ -101,6 +101,8 @@ namespace CityInformation.API.Repositories
                 .Take(pageSize)
                 .OrderBy(c => c.Name).ToListAsync();
 
+            Console.WriteLine("filetred pagination");
+
             return (filetred, pagination);
         }
 

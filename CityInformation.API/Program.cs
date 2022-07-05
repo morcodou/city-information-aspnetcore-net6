@@ -1,5 +1,7 @@
 using CityInformation.API;
 using CityInformation.API.DbContexts;
+using CityInformation.API.Decorators;
+using CityInformation.API.Interceptors;
 using CityInformation.API.Interfaces;
 using CityInformation.API.Repositories;
 using CityInformation.API.Services;
@@ -67,7 +69,11 @@ builder.Services.AddDbContext<CityInformationContext>(
     .UseSqlite(builder
                 .Configuration["ConnectionStrings:CityInformationDb"])
 );
-builder.Services.AddScoped<ICityRepository, CityRepository>();
+
+//builder.Services.AddScoped<ICityRepository, CityRepository>();
+//builder.Services.Decorate<ICityRepository, LoggerCityRepositoryDecorator>();
+
+builder.Services.AddInterceptorScoped<ICityRepository, CityRepository, LogExecutionInterceptor>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAuthentication("Bearer")
